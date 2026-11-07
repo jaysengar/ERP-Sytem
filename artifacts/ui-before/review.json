@@ -1,0 +1,474 @@
+{
+  "results": [
+    {
+      "name": "dashboard-desktop",
+      "overflow": false,
+      "heading": "Dashboard",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "7px"
+        },
+        {
+          "text": "Single store",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Sample data. Real possibilities.",
+          "fontSize": "10px"
+        },
+        {
+          "text": "",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Owner / Admin",
+          "fontSize": "9px"
+        },
+        {
+          "text": "Collected across all payment methods",
+          "fontSize": "10px"
+        },
+        {
+          "text": "36 pieces sold today",
+          "fontSize": "10px"
+        },
+        {
+          "text": "6,611 pieces available in store",
+          "fontSize": "10px"
+        },
+        {
+          "text": "8 variants are out of stock",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Revenue after discounts, excluding GST",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Date",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Revenue",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Orders",
+          "fontSize": "10px"
+        },
+        {
+          "text": "A quick bill. A happy customer.Your stock tak",
+          "fontSize": "11px"
+        },
+        {
+          "text": "All recorded purchase orders",
+          "fontSize": "9px"
+        }
+      ]
+    },
+    {
+      "name": "products-desktop",
+      "overflow": false,
+      "heading": "Products",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "7px"
+        },
+        {
+          "text": "Single store",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Sample data. Real possibilities.",
+          "fontSize": "10px"
+        },
+        {
+          "text": "",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Owner / Admin",
+          "fontSize": "9px"
+        },
+        {
+          "text": "9 categories · 14 brands",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Product",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Category / brand",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Variant",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Selling price",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Selling price",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Stock",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Status",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Actions",
+          "fontSize": "10px"
+        },
+        {
+          "text": "UT-017-01",
+          "fontSize": "10px"
+        }
+      ]
+    },
+    {
+      "name": "pos-desktop",
+      "overflow": false,
+      "heading": "POS Billing",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "7px"
+        },
+        {
+          "text": "Single store",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Sample data. Real possibilities.",
+          "fontSize": "10px"
+        },
+        {
+          "text": "",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Owner / Admin",
+          "fontSize": "9px"
+        },
+        {
+          "text": "All products",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Shirts",
+          "fontSize": "11px"
+        },
+        {
+          "text": "T-Shirts",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Jeans",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Trousers",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Kurtis",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Sarees",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Suits",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Kids Wear",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Accessories",
+          "fontSize": "11px"
+        }
+      ]
+    },
+    {
+      "name": "dashboard-tablet",
+      "overflow": false,
+      "heading": "Dashboard",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "7px"
+        },
+        {
+          "text": "Single store",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Sample data. Real possibilities.",
+          "fontSize": "10px"
+        },
+        {
+          "text": "",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Owner / Admin",
+          "fontSize": "9px"
+        },
+        {
+          "text": "Collected across all payment methods",
+          "fontSize": "10px"
+        },
+        {
+          "text": "36 pieces sold today",
+          "fontSize": "10px"
+        },
+        {
+          "text": "6,611 pieces available in store",
+          "fontSize": "10px"
+        },
+        {
+          "text": "8 variants are out of stock",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Revenue after discounts, excluding GST",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Date",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Revenue",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Orders",
+          "fontSize": "10px"
+        },
+        {
+          "text": "A quick bill. A happy customer.Your stock tak",
+          "fontSize": "11px"
+        },
+        {
+          "text": "All recorded purchase orders",
+          "fontSize": "9px"
+        }
+      ]
+    },
+    {
+      "name": "dashboard-mobile",
+      "overflow": true,
+      "heading": "Dashboard",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "7px"
+        },
+        {
+          "text": "Single store",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Sample data. Real possibilities.",
+          "fontSize": "10px"
+        },
+        {
+          "text": "",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Here’s what’s happening at Urban Thread today",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Collected across all payment methods",
+          "fontSize": "9px"
+        },
+        {
+          "text": "36 pieces sold today",
+          "fontSize": "9px"
+        },
+        {
+          "text": "6,611 pieces available in store",
+          "fontSize": "9px"
+        },
+        {
+          "text": "8 variants are out of stock",
+          "fontSize": "9px"
+        },
+        {
+          "text": "Revenue after discounts, excluding GST",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Date",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Revenue",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Orders",
+          "fontSize": "10px"
+        },
+        {
+          "text": "A quick bill. A happy customer.Your stock tak",
+          "fontSize": "11px"
+        },
+        {
+          "text": "All recorded purchase orders",
+          "fontSize": "9px"
+        }
+      ]
+    },
+    {
+      "name": "products-mobile",
+      "overflow": false,
+      "heading": "Products",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "7px"
+        },
+        {
+          "text": "Single store",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Sample data. Real possibilities.",
+          "fontSize": "10px"
+        },
+        {
+          "text": "",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Every style, size and colour. All in one plac",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Export",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Import",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Add product",
+          "fontSize": "11px"
+        },
+        {
+          "text": "9 categories · 14 brands",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Product",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Category / brand",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Variant",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Selling price",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Selling price",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Stock",
+          "fontSize": "10px"
+        }
+      ]
+    },
+    {
+      "name": "pos-mobile",
+      "overflow": false,
+      "heading": "POS Billing",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "7px"
+        },
+        {
+          "text": "Single store",
+          "fontSize": "10px"
+        },
+        {
+          "text": "Sample data. Real possibilities.",
+          "fontSize": "10px"
+        },
+        {
+          "text": "",
+          "fontSize": "11px"
+        },
+        {
+          "text": "A smooth checkout, from the first scan to the",
+          "fontSize": "11px"
+        },
+        {
+          "text": "All products",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Shirts",
+          "fontSize": "11px"
+        },
+        {
+          "text": "T-Shirts",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Jeans",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Trousers",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Kurtis",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Sarees",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Suits",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Kids Wear",
+          "fontSize": "11px"
+        },
+        {
+          "text": "Accessories",
+          "fontSize": "11px"
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

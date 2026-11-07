@@ -1,0 +1,82 @@
+{
+  "results": [
+    {
+      "name": "dashboard-desktop",
+      "overflow": false,
+      "heading": "Dashboard",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "8px"
+        }
+      ]
+    },
+    {
+      "name": "products-desktop",
+      "overflow": false,
+      "heading": "Products",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "8px"
+        }
+      ]
+    },
+    {
+      "name": "pos-desktop",
+      "overflow": false,
+      "heading": "POS Billing",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "8px"
+        }
+      ]
+    },
+    {
+      "name": "dashboard-tablet",
+      "overflow": false,
+      "heading": "Dashboard",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "8px"
+        }
+      ]
+    },
+    {
+      "name": "dashboard-mobile",
+      "overflow": false,
+      "heading": "Dashboard",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "8px"
+        }
+      ]
+    },
+    {
+      "name": "products-mobile",
+      "overflow": false,
+      "heading": "Products",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "8px"
+        }
+      ]
+    },
+    {
+      "name": "pos-mobile",
+      "overflow": false,
+      "heading": "POS Billing",
+      "smallText": [
+        {
+          "text": "YOUR STORE, CONNECTED",
+          "fontSize": "8px"
+        }
+      ]
+    }
+  ],
+  "errors": []
+}
