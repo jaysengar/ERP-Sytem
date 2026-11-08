@@ -451,3 +451,28 @@ input::placeholder, textarea::placeholder { color: #637187; }
   tr, .invoice-totals, .invoice-footer { break-inside: avoid; }
   .invoice-sheet th, .invoice-sheet td { padding: 10px 12px; }
 }
+
+/* Account access follows the existing store form and typography system. */
+.auth-page { min-height: 100dvh; display: grid; place-items: center; padding: 32px 20px; }
+.auth-panel { width: min(100%, 470px); padding: 36px; background: var(--surface, white); border: 1px solid var(--line); border-radius: 12px; }
+.auth-panel .brand { padding: 0; margin-bottom: 32px; }
+.auth-panel h1 { font-size: 28px; line-height: 1.2; letter-spacing: -0.025em; margin-bottom: 12px; }
+.auth-intro, .auth-help { color: var(--muted); line-height: 1.7; }
+.auth-intro { margin-bottom: 28px; }
+.auth-help { margin-top: 20px; font-size: 13px; }
+.auth-panel .form-footer .btn { width: 100%; }
+.auth-panel .form-footer { position: static; }
+.auth-panel .checkbox-label { display: grid; grid-template-columns: 18px 1fr; align-items: start; gap: 10px; }
+.connection-warning { margin: 0; padding: 12px 24px; background: #fff4df; color: #71510e; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+@media (max-width: 520px) { .auth-page { padding: 20px 12px; } .auth-panel { padding: 26px 22px; } .auth-panel input { font-size: 16px; } }
+
+.auth-switch { margin-top: 20px; min-height: 44px; text-align: left; }
+.billing-panel { max-width: 740px; }
+.billing-content { padding: 0 24px 28px; }
+.billing-content > p { margin: 20px 0; line-height: 1.7; }
+.billing-price { font-size: 34px; font-weight: 650; color: var(--navy); }
+.billing-price span { font-size: 16px; font-weight: 400; color: var(--muted); }
+.billing-details { display: flex; gap: 40px; flex-wrap: wrap; margin: 24px 0; }
+.billing-details dt { color: var(--muted); margin-bottom: 6px; }
+.billing-details dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.billing-content .actions { flex-wrap: wrap; }

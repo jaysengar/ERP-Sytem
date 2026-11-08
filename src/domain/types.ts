@@ -12,6 +12,7 @@ export interface Supplier { id: string; name: string; contact: string; mobile: s
 export interface SaleLine { productId: string; name: string; sku: string; size: string; colour: string; quantity: number; price: number; cost: number | null }
 export interface InvoiceShop { name: string; address: string; phone: string; gstin: string; footer: string }
 export interface Sale {
+  sample?: boolean;
   id: string; invoice: string; date: string; customerId?: string; customerName: string; mobile: string;
   lines: SaleLine[]; subtotal: number; discount: number; taxRate: number; tax: number; total: number;
   paymentMethod: PaymentMethod; paymentStatus: 'Paid'; shop: InvoiceShop;

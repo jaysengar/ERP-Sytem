@@ -1,9 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test('billing saves an invoice, reduces stock, and survives reload', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Dashboard', exact: true })).toBeVisible();
-  const quantity = await page.evaluate(() => JSON.parse(localStorage.getItem('smart-retail-demo:v1')!).products.find((p: { id: string }) => p.id === 'p-2').quantity);
+  const quantity = await page.evaluate(async () => (await (await fetch(`/api/w/${localStorage.getItem('retail-workspace')}/state`)).json()).data.products.find((p: { id: string }) => p.id === 'p-2').quantity);
   await page.goto('/pos');
   await page.getByRole('textbox', { name: 'Scan or enter barcode' }).fill('8901000000002');
   await page.getByRole('button', { name: 'Add barcode product' }).click();
@@ -18,7 +18,7 @@ test('billing saves an invoice, reduces stock, and survives reload', async ({ pa
   await expect(page.getByText('Payment recorded and inventory updated.')).toBeVisible();
   await page.getByRole('button', { name: 'Close', exact: true }).click();
   await page.reload();
-  const data = await page.evaluate(() => JSON.parse(localStorage.getItem('smart-retail-demo:v1')!));
+  const data = await page.evaluate(async () => (await (await fetch(`/api/w/${localStorage.getItem('retail-workspace')}/state`)).json()).data);
   expect(data.products.find((p: { id: string }) => p.id === 'p-2').quantity).toBe(quantity - 3);
   expect(data.sales.at(-1).customerName).toBe('Demo Buyer');
   await page.goto('/customers');
@@ -28,11 +28,11 @@ test('billing saves an invoice, reduces stock, and survives reload', async ({ pa
 test('receiving a purchase adds stock once', async ({ page }) => {
   await page.goto('/purchases');
   await expect(page.getByRole('heading', { name: 'Purchases & suppliers' })).toBeVisible();
-  const before = await page.evaluate(() => { const db = JSON.parse(localStorage.getItem('smart-retail-demo:v1')!); const order = db.purchases.find((p: { status: string }) => p.status === 'Ordered'); return { id: order.id, line: order.lines[0], stock: db.products.find((p: { id: string }) => p.id === order.lines[0].productId).quantity }; });
+  const before = await page.evaluate(async () => { const db = (await (await fetch(`/api/w/${localStorage.getItem('retail-workspace')}/state`)).json()).data; const order = db.purchases.find((p: { status: string }) => p.status === 'Ordered'); return { id: order.id, line: order.lines[0], stock: db.products.find((p: { id: string }) => p.id === order.lines[0].productId).quantity }; });
   await page.getByRole('button', { name: 'Receive', exact: true }).first().click();
   await page.getByRole('button', { name: 'Receive stock', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  const after = await page.evaluate(() => JSON.parse(localStorage.getItem('smart-retail-demo:v1')!));
+  const after = await page.evaluate(async () => (await (await fetch(`/api/w/${localStorage.getItem('retail-workspace')}/state`)).json()).data);
   expect(after.products.find((p: { id: string }) => p.id === before.line.productId).quantity).toBe(before.stock + before.line.quantity);
   expect(after.purchases.find((p: { id: string }) => p.id === before.id).status).toBe('Received');
 });
@@ -64,7 +64,15 @@ test('cashier restrictions and all navigation routes render', async ({ page }) =
     await page.goto(route); await expect(page.getByRole('heading', { name: heading, exact: true, level: 1 })).toBeVisible();
   }
   await page.goto('/staff');
-  await page.getByLabel('Current demo role').selectOption('Cashier');
+  await page.evaluate(async () => {
+    const api = `/api/w/${localStorage.getItem('retail-workspace')}`;
+    const state = await (await fetch(api + '/state')).json();
+    const headers = { 'Content-Type': 'application/json', 'X-Retail-Request': '1', 'Idempotency-Key': crypto.randomUUID() };
+    const saved = await fetch(api + '/commands', { method: 'POST', headers, body: JSON.stringify({ type: 'staff.save', expectedRevision: state.data.revision, input: { id: 'cashier', name: 'Test Cashier', email: 'cashier@example.test', role: 'Cashier', active: true, password: 'Cashier password 123!' } }) });
+    if (!saved.ok) throw new Error(await saved.text());
+    await fetch(api + '/auth/login', { method: 'POST', headers, body: JSON.stringify({ email: 'cashier@example.test', password: 'Cashier password 123!' }) });
+  });
+  await page.reload();
   await page.getByRole('link', { name: 'Products', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Add product', exact: true })).toHaveCount(0);
   await page.getByRole('link', { name: 'Expenses', exact: true }).click();
@@ -76,7 +84,7 @@ test('mobile navigation fits and invoice has a print layout', async ({ page }) =
   await page.getByRole('button', { name: 'Open navigation' }).click();
   await page.getByRole('link', { name: 'Sales history', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Sales history', exact: true })).toBeVisible();
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  const overflow = await page.evaluate(async () => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflow).toBe(false);
   await page.getByRole('button', { name: /View invoice/ }).filter({ visible: true }).first().click();
   await page.emulateMedia({ media: 'print' });

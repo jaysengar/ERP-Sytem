@@ -5,3 +5,10 @@ playwright-report/
 .impeccable/
 *.log
 *.tsbuildinfo
+.env
+.env.*
+!.env.example
+server/data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

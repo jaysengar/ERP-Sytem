@@ -49,7 +49,7 @@ export function seedDatabase(now = new Date()): Database {
         return { productId: p.id, name: p.name, sku: p.sku, size: p.size, colour: p.colour, quantity: 1 + ((n + k) % 3 === 0 ? 1 : 0), price: p.sellingPrice, cost: p.purchasePrice };
       });
       const subtotal = sum(lines, l => l.quantity * l.price); const discount = n % 4 === 0 ? round(subtotal * 0.05) : 0;
-      sales.push({ id: `sale-${sales.length + 1}`, invoice: `UT-${String(sales.length + 1).padStart(5, '0')}`, date: date.toISOString(), customerId: n % 5 === 0 ? undefined : customer.id, customerName: n % 5 === 0 ? 'Walk-in customer' : customer.name, mobile: n % 5 === 0 ? '' : customer.mobile, lines, subtotal, discount, tax: 0, taxRate: 0, total: round(subtotal - discount), paymentMethod: (['Cash', 'UPI', 'Card'] as const)[n % 3], paymentStatus: 'Paid', shop: { name: settings.shopName, address: settings.address, phone: settings.phone, gstin: '', footer: settings.invoiceFooter } });
+      sales.push({ sample: true, id: `sale-${sales.length + 1}`, invoice: `UT-${String(sales.length + 1).padStart(5, '0')}`, date: date.toISOString(), customerId: n % 5 === 0 ? undefined : customer.id, customerName: n % 5 === 0 ? 'Walk-in customer' : customer.name, mobile: n % 5 === 0 ? '' : customer.mobile, lines, subtotal, discount, tax: 0, taxRate: 0, total: round(subtotal - discount), paymentMethod: (['Cash', 'UPI', 'Card'] as const)[n % 3], paymentStatus: 'Paid', shop: { name: settings.shopName, address: settings.address, phone: settings.phone, gstin: '', footer: settings.invoiceFooter } });
     }
   }
   const purchases = Array.from({ length: 14 }, (_, i) => {

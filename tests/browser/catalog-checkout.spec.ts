@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
+test.use({ hasTouch: true });
 
 test('removing one filter preserves the other selection and sort order', async ({ page }) => {
   await page.goto('/products?category=Accessories&brand=Allen+Solly&sort=price-desc');
@@ -56,9 +57,8 @@ test('checkout announces cart changes and guides recovery from an invalid mobile
   await expect(page.getByRole('dialog').getByText('M · Sky × 2')).toBeVisible();
 });
 
-test('catalogue and checkout remain usable at narrow and landscape sizes', async ({ browser }) => {
-  const context = await browser.newContext({ hasTouch: true, reducedMotion: 'reduce' });
-  const page = await context.newPage();
+test('catalogue and checkout remain usable at narrow and landscape sizes', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   try {
     for (const viewport of [{ width: 320, height: 740 }, { width: 812, height: 375 }]) {
       await page.setViewportSize(viewport);
@@ -75,5 +75,5 @@ test('catalogue and checkout remain usable at narrow and landscape sizes', async
       await expect(page.getByRole('dialog')).toBeVisible();
       await page.getByRole('button', { name: 'Close dialog' }).click();
     }
-  } finally { await context.close(); }
+  } finally { /* The fixture closes this page. */ }
 });

@@ -1,13 +1,14 @@
 import { ChevronDown } from 'lucide-react';
+import { useRef } from 'react';
 import { useStore } from '../data/Store';
 import { categories } from '../domain/types';
 import type { Category, Product } from '../domain/types';
-import { saveProduct } from '../domain/transactions';
 import { uid } from '../domain/format';
 import { Dialog, Field, Form, numberValue, textValue } from './ui';
 
 export function ProductForm({ product, onClose }: { product?: Product; onClose: () => void }) {
-  const { db, role, mutate, toast } = useStore();
+  const { db, mutate, toast } = useStore();
+  const revision = useRef(db.revision);
   return (
     <Dialog title={product ? 'Edit product' : 'Add a new product'} onClose={onClose} wide>
       <p className="product-form-intro">Create one size and colour combination at a time. <span>Fields marked <b aria-hidden="true">*</b><span className="sr-only">with an asterisk</span> are required.</span></p>
@@ -21,7 +22,7 @@ export function ProductForm({ product, onClose }: { product?: Product; onClose: 
           quantity: product?.quantity ?? numberValue(data, 'quantity'), minStock: numberValue(data, 'minStock'),
           image: textValue(data, 'image'),
         };
-        await mutate(draft => saveProduct(draft, role, next));
+        await mutate('product.save', next, revision.current);
         toast(product ? 'Product updated.' : 'Product added to your store.');
         onClose();
       }}>

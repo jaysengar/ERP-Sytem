@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test('invalid product fields have visible errors and preserve entered values', async ({ page }) => {
   await page.goto('/products');
@@ -84,7 +84,7 @@ test('profile opens a menu and the header shows the current page', async ({ page
   await page.goto('/expenses');
   await expect(page.locator('.store-breadcrumb strong')).toHaveText('Expenses');
   await page.getByRole('button', { name: 'Open profile menu' }).click();
-  await page.getByRole('button', { name: 'Staff & demo permissions' }).click();
+  await page.getByRole('button', { name: 'Staff & permissions' }).click();
   await expect(page.getByRole('heading', { name: 'Staff & access', exact: true })).toBeVisible();
 });
 

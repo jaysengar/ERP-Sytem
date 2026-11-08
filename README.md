@@ -1,98 +1,97 @@
-# Smart Retail ERP demo
+# Smart Retail ERP
 
-A single-store clothing retail demo for a shop owner moving from notebook records to connected daily workflows. Built with React, TypeScript, Tailwind CSS, Lucide and Recharts. The fictional shop, **Urban Thread**, can be renamed in Settings.
+A connected retail ERP with separate business workspaces, staff login and Razorpay subscriptions: **₹1,500/month, paid upfront, with a 7-day money-back guarantee on the first payment**.
 
-This is a **local frontend demo**, not a production ERP. It does not have server authentication, actual payment processing, production backups or GST compliance certification. The role switch demonstrates permissions; browser users can access local data.
+The React interface uses a Node.js API. **Supabase PostgreSQL support is prepared for SaaS hosting**, with business records isolated by row-level security. Until your private database connection is configured, local development continues using the existing SQLite files. No records have been uploaded to the cloud.
 
-## Start
+Follow the [Supabase setup guide](server/SUPABASE.md) when your project is available. It covers the private database connection string, driver installation, migrations and optional import of existing records. Supabase browser API keys are not required by this backend.
 
-Use **Node.js 24 or later** (the dependency-free domain tests use Node's TypeScript support).
+## Run locally
+
+Use Node.js 24 or later. In Windows PowerShell, use `npm.cmd` if execution policy blocks `npm.ps1`.
 
 ```powershell
 cd C:\Users\jayxj\Documents\smart-retail-erp
-npm install
-npm run dev
+npm.cmd install
+npm.cmd run dev
 ```
 
-Open the local URL printed by Vite, usually http://127.0.0.1:5173.
+Open **http://127.0.0.1:5173**. This starts the frontend and backend together. Configure Razorpay test credentials as described below, choose **New business? Get started**, create a workspace ID and owner account, and continue to Razorpay to pay ₹1,500. After payment is confirmed, add staff from **Staff & access**. There are no default passwords. Staff sign in with their workspace ID, email and assigned password.
+
+Run `npm run dev` in one terminal at a time. Press **Ctrl+C** there to stop both servers before restarting. If a port is occupied, startup now identifies it and exits before starting either server. Backend port: `PORT` in `.env`; frontend port: Vite's `--port` option. Update `APP_ORIGIN` if you change browser ports.
+
+Registration starts an empty store unless you select fictional sample data. Set your shop address, phone and invoice details in Settings before issuing bills. The previous browser demo is not overwritten or automatically imported; Settings can download those records for reference.
+
+For a build served directly by Node:
 
 ```powershell
-npm run build
-npm run preview
-npm test
-npx playwright install chromium
-npm run test:e2e
+npm.cmd run build
+npm.cmd start
 ```
 
-The browser tests use an isolated browser context and never change an existing browser profile. `npm test` runs without downloading packages. A future deployment needs a host with SPA history fallback to `index.html`.
+Without production environment settings this runs locally at http://127.0.0.1:3001. See the [server guide](server/README.md) for HTTPS hosting.
 
-To run the browser tests with an already installed Google Chrome instead of downloading Chromium:
+## Database setup
+
+Later, set `DATABASE_DRIVER=postgres` and `DATABASE_URL` in `.env`, using your Supabase session-pooler connection on port 5432, then run:
 
 ```powershell
+npm.cmd run db:install
+npm.cmd run db:migrate
+npm.cmd run db:check
+```
+
+Restart the server afterward. Production requires PostgreSQL; local SQLite remains available with `DATABASE_DRIVER=sqlite`. Package downloads were blocked during implementation, so the optional PostgreSQL driver is not installed yet and the hosted database has not been tested.
+
+Use `npm.cmd run db:import` for a read-only preview of your existing local records. The [import guide](server/SUPABASE.md#move-the-current-local-records) explains the explicit transfer into an empty cloud database.
+
+## Razorpay
+
+Use `.env.example` as a template and fill in the private, Git-ignored `.env` file:
+
+- `RAZORPAY_KEY_ID`
+- `RAZORPAY_KEY_SECRET`
+- `RAZORPAY_PLAN_ID`
+- `RAZORPAY_WEBHOOK_SECRET`
+
+Use test keys and a matching plan: **INR 150000 paise, monthly, interval 1**. Restart the server after configuration changes. The backend checks the plan price before creating a subscription.
+
+Set the webhook URL to `https://YOUR-HOST/api/webhooks/razorpay`. Real test webhooks need a public HTTPS development host; Razorpay cannot reach localhost. Follow the [Razorpay setup guide](server/README.md#razorpay).
+
+The owner authorizes the first ₹1,500 payment and monthly renewals on Razorpay's hosted checkout. Editing activates only after the backend verifies the captured monthly payment and its subscription invoice. A checkout redirect or mandate authorization alone does not activate access. Missing payment configuration blocks signup; an interrupted checkout can be resumed from Billing.
+
+Cancel from **Billing & subscription** within seven days of the first confirmed payment to end editing access immediately and request a full ₹1,500 refund to the original payment method. After seven days, cancellation stops future renewals and access continues through the paid period. Saved records remain available. Renewals and later subscriptions do not restart the guarantee. Existing accounts created under the previous free-trial policy keep their original trial terms.
+
+Billing shows pending, processed or failed refund status and the provider reference. Bank credit times vary. Refunds with an uncertain provider response require reconciliation or support review before another attempt; repeated clicks do not blindly send another refund. See the [server guide](server/README.md#refund-recovery) for recovery details.
+
+## Connected workflows
+
+- Products, SQL search/pagination, atomic CSV import and stock adjustments.
+- POS checkout, inventory deductions, customers and invoice snapshots.
+- Suppliers, purchase orders, one-time receiving and payment status updates.
+- Expenses, dashboards/reports, customers, sales history and shop settings.
+- Owner, cashier and inventory roles, enforced by the API with restricted data redacted.
+- Staff credentials, sign-out and password changes, salted hashes and HttpOnly sessions.
+- Refresh every 15 seconds/on focus, connection warnings and retries for uncertain saves.
+- Revision checks for stale updates; idempotency keys for duplicate prevention.
+- Business registration, upfront subscription checkout, a fixed seven-day refund window and renewal cancellation.
+
+POS methods record payments received outside this app. Razorpay pays for the **ERP subscription**, not shoppers' purchases. The simplified GST/accounting model remains: one GST rate, no returns/refunds or GST compliance certification. Sample invoices remain labelled as demonstrations.
+
+## Checks
+
+```powershell
+npm.cmd test
 $env:PLAYWRIGHT_CHANNEL = 'chrome'
-npm run test:e2e
+npm.cmd run test:e2e
 ```
 
-## What's implemented
+The browser command builds the app and runs a temporary isolated backend. Tests never load your `.env`, call real Razorpay, or change your local workspace databases. Without installed Chrome, install Playwright Chromium and omit `PLAYWRIGHT_CHANNEL`.
 
-- Dashboard with calculated daily sales, orders, product counts, stock alerts, purchase amount, expenses, sales chart, recent invoices and bestsellers.
-- 144 SKU variants across nine categories and 18 styles, 18 fictional customers, four suppliers, three staff, 90 days of sales, 14 purchases and 25 expenses.
-- Product creation, editing, confirmed deletion, detail and sibling variant views, name/SKU/barcode search, category/brand/stock filters, sorting and pagination.
-- CSV template, validated atomic imports (up to 500 new products), and filtered exports. SKU and barcode uniqueness are enforced. The demo uses category icons until an image URL is provided.
-- POS product and barcode lookup, quantity controls, cart removal and clearing, optional customer identity, fixed rupee discount, Cash/UPI/Card/Other, explicit bill review, saved invoices and print layout.
-- Sales reduce stock atomically. A purchase marked received increases stock once. Receiving uses a weighted average purchase cost for future bills. Every new stock change records a movement.
-- Supplier contacts, purchases with multiple lines and payment status updates; order totals and history.
-- Searchable/date-filtered invoices, daily summary, customer histories and expense entry with daily/monthly totals.
-- Daily/weekly/monthly sales, product and bestseller reports, low stock, purchase and expense reports, chart data tables and CSV downloads.
-- Staff administration and role permission previews, shop/profile settings, INR, low-stock defaults, invoice settings, optional GST, JSON backup download and confirmed reset.
-- Readable type and contrast, responsive navigation with keyboard focus containment, native dialogs, route loading within the app shell, and a working profile menu.
-- Mobile invoice summaries, a Products/Current bill switch for phone checkout, visible invoice actions, and scroll hints for wide tables.
-- Field-level validation and linked error summaries preserve entered values and keep focused fields visible. Empty states, loading feedback and reduced motion are supported.
-- Grouped product entry with optional photo/variant fields, labelled catalogue filters, removable filter selections and accessible sort state.
-- Contextual cart confirmations, marked payment selection and mobile-number error recovery beside the checkout field.
+See [VERIFICATION.md](VERIFICATION.md). Real provider checkout, refunds and webhook delivery require a separate check with your Razorpay test account.
 
-## A five-minute shop-owner demonstration
+## Structure and current limits
 
-1. **Dashboard:** explain today's figures and low-stock alerts.
-2. **Products:** search `UT-001-02`, open its details and see its sizes/colours. Check its quantity.
-3. **POS Billing:** enter barcode `8901000000002`, add three pieces, optionally enter a customer mobile, review and complete the bill. Use Print invoice to print or save as PDF.
-4. **Inventory:** search the same SKU. Its stock is now three pieces lower; Stock history records the invoice.
-5. **Purchases:** create an order with several products, save, then Receive it. The stock increases exactly once.
-6. **Customers:** search the mobile used at checkout and open the purchase history.
-7. **Reports:** compare revenue, estimated gross profit and expenses. Try the daily, weekly and monthly reports and export a CSV.
+`src/data/repository.ts` is the typed HTTP client; `src/domain/commands.ts` defines commands. `server/saas.mjs` handles workspaces and routes; `server/subscriptions.mjs` verifies payments and manages cancellation/refund state; `server/app.mjs` handles staff and transactions; `server/database.mjs` is the shared record repository; `server/postgres.mjs` connects PostgreSQL; `server/sqlite.mjs` supports local storage; `server/billing.mjs` connects Razorpay. Local database files live in `server/data/` and are ignored by Git.
 
-## Data and accounting boundaries
-
-- Data persists under localStorage key `smart-retail-demo:v1`. Refreshing preserves saved records. Tabs use the Web Locks API where available to serialize changes. Clearing browser site data removes the demo.
-- Unsaved POS cart lines use sessionStorage. Customer fields and discounts are not persisted in the draft. Other unsaved forms do not persist.
-- Seed inventory is an **opening snapshot**, not a reconstruction from seed historical sales and purchases. Stock movement history starts with operations performed in the demo.
-- Sales and purchase records keep item snapshots so deleted products and later price changes do not rewrite history. Invoices also keep shop/tax/footer snapshots.
-- The dashboard's total sales represent money collected including GST if configured. Sales revenue in charts/reports is after discounts and excludes GST.
-- Estimated gross profit uses discounted net line revenue minus the cost saved at checkout. If a cost is unavailable, that line is excluded and cost coverage is shown. This is **not net profit** and excludes operating expenses.
-- GST starts disabled. The demonstration supports one configured rate on the discounted taxable amount. Real GST treatment, HSN codes, per-item rates, CGST/SGST/IGST and returns require a separate live implementation.
-- Product minimum levels apply per SKU. The Settings threshold is the default for newly created SKUs.
-- CSV exports prefix spreadsheet formula characters. Imports create new SKUs; they do not overwrite existing inventory.
-
-## Project structure
-
-```text
-src/
-  components/  Shared layout, dialogs, forms, tables, product thumbnails, invoices
-  data/        Seed records, repository contract/local adapter, React store
-  domain/      Types, permissions, validation, transactions, queries, analytics, CSV
-  pages/       Dashboard, Products/Inventory, POS, Purchases, Sales, Customers,
-               Expenses, Reports, Staff and Settings
-  styles.css   Design tokens, responsive layouts, states, print stylesheet
-server/
-  README.md    Future Express/MongoDB contracts and migration plan
-tests/
-  domain.test.mjs        Transaction and calculation tests
-  browser/              Playwright workflow and responsive tests
-scripts/
-  register-ts.mjs        Node test resolver for Vite-style TS imports
-  check-source.mjs       TS/TSX syntax and local import verification
-  inspect-ui.mjs         Chrome screenshots, page errors and viewport checks
-  check-contrast.mjs     Sampled text-contrast checks across all routes
-```
-
-See [DESIGN.md](DESIGN.md) for UI decisions, [PRODUCT.md](PRODUCT.md) for product scope, [server/README.md](server/README.md) for the API migration plan and [VERIFICATION.md](VERIFICATION.md) for checks actually performed.
+The full snapshot provider is retained for dashboards, POS and reports. Product listings paginate in SQL, but large catalogues and long histories need paginated read models and server aggregates before scaling. Public commercial launch also needs email verification/recovery, legal pages, operational backups and monitoring; those are not implemented by this integration.

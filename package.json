@@ -5,11 +5,19 @@
   "type": "module",
   "engines": { "node": ">=24" },
   "scripts": {
-    "dev": "vite --configLoader native --host 127.0.0.1",
+    "dev": "node scripts/dev.mjs",
+    "dev:client": "vite --configLoader native --host 127.0.0.1",
+    "dev:server": "node --env-file-if-exists=.env --import ./scripts/register-ts.mjs server/index.mjs",
+    "start": "node --env-file-if-exists=.env --import ./scripts/register-ts.mjs server/index.mjs",
     "build": "tsc -b && vite build --configLoader native",
     "preview": "vite preview --configLoader native --host 127.0.0.1",
-    "test": "node --import ./scripts/register-ts.mjs --test tests/domain.test.mjs",
-    "test:e2e": "playwright test"
+    "db:install": "npm install --prefix server/postgres-runtime",
+    "db:migrate": "node --env-file-if-exists=.env scripts/database.mjs migrate",
+    "db:check": "node --env-file-if-exists=.env scripts/database.mjs check",
+    "db:import": "node --env-file-if-exists=.env --import ./scripts/register-ts.mjs scripts/import-sqlite.mjs",
+    "test:postgres": "node --import ./scripts/register-ts.mjs --test tests/postgres.integration.test.mjs",
+    "test": "node --import ./scripts/register-ts.mjs --test tests/domain.test.mjs tests/backend.test.mjs tests/dev.test.mjs tests/storage.test.mjs",
+    "test:e2e": "npm run build && node --import ./scripts/register-ts.mjs scripts/e2e.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.0",

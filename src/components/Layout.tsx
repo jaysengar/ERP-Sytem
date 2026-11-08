@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Package, ScanLine, Boxes, Truck, ReceiptText, Users, Wallet, ChartNoAxesCombined, ShieldCheck, Settings, Store, Bell, Search, ChevronDown, Menu, X, ArrowUpRight, ArrowRight, CircleHelp, ShoppingBag } from 'lucide-react';
 import { useStore } from '../data/Store';
 import { can } from '../domain/types';
+import { ChangePassword } from './ChangePassword';
 import { Badge, Dialog, Empty, ProductThumb } from './ui';
 
 const nav = [
@@ -27,7 +28,8 @@ const tour = [
 ];
 
 export function Layout() {
-  const { db, role } = useStore();
+  const { db, role, user, workspace, connected, logout, refresh, toast } = useStore();
+  const [password, setPassword] = useState(false);
   const [menu, setMenu] = useState(false);
   const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 1050px)').matches);
   const [notifications, setNotifications] = useState(false);
@@ -41,7 +43,7 @@ export function Layout() {
   const menuButton = useRef<HTMLButtonElement>(null);
   const low = db.products.filter(p => p.quantity <= p.minStock);
   const pageName = nav.find(([path]) => path === location.pathname)?.[1]
-    || (location.pathname === '/staff' ? 'Staff & access' : location.pathname === '/settings' ? 'Settings' : 'Store');
+    || (location.pathname === '/staff' ? 'Staff & access' : location.pathname === '/settings' ? 'Settings' : location.pathname === '/billing' ? 'Billing' : 'Store');
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 1050px)');
@@ -104,10 +106,11 @@ export function Layout() {
           <div className="nav-divider" />
           <NavLink to="/staff" className="nav-item"><ShieldCheck size={19} aria-hidden="true" />Staff & access</NavLink>
           <NavLink to="/settings" className="nav-item"><Settings size={19} aria-hidden="true" />Settings</NavLink>
+          {can(role, 'settings') && <NavLink to="/billing" className="nav-item"><ReceiptText size={19} aria-hidden="true" />Billing & subscription</NavLink>}
         </nav>
         <div className="sidebar-bottom">
           <button className="help-btn" onClick={() => { setMenu(false); setGuide(true); }}><CircleHelp size={18} aria-hidden="true" /><span>Take a quick tour</span><ArrowUpRight size={15} aria-hidden="true" /></button>
-          <div className="demo-note"><span className="demo-dot" /><div><strong>Demo workspace</strong><small>Sample data. Real possibilities.</small></div></div>
+          <div className="demo-note"><span className="demo-dot" /><div><strong>Store workspace</strong><small>One shared store database.</small></div></div>
         </div>
       </aside>
       <div className="workspace" inert={mobile && menu}>
@@ -115,20 +118,23 @@ export function Layout() {
           <div className="topbar-left"><button ref={menuButton} className="icon-btn menu-toggle" aria-label="Open navigation" aria-controls="store-navigation" aria-expanded={menu} onClick={() => setMenu(true)}><Menu size={22} /></button><span className="store-breadcrumb"><Store size={16} aria-hidden="true" />{db.settings.shopName}<span>/</span><strong>{pageName}</strong></span></div>
           <form className="global-search" role="search" onSubmit={e => { e.preventDefault(); navigate(`/products?search=${encodeURIComponent(query)}`); }}><Search size={17} aria-hidden="true" /><input ref={search} aria-label="Search all products" placeholder="Search products…" value={query} onChange={e => setQuery(e.target.value)} /><kbd aria-hidden="true">Ctrl K</kbd><button type="submit" aria-label="Search products"><ArrowRight size={17} /></button></form>
           <div className="topbar-right">
-            <span className="top-demo">Demo</span>
+            <span className="top-demo">{connected ? 'Connected' : 'Offline'}</span>
             <button className="icon-btn notification-btn" aria-label={`${low.length} stock alerts`} onClick={() => setNotifications(true)}><Bell size={20} />{low.length > 0 && <span />}</button>
             <span className="top-separator" />
-            <button className="profile-btn" aria-label="Open profile menu" aria-haspopup="dialog" onClick={() => setProfile(true)}><span className="avatar">{db.settings.profileName.split(' ').map(n => n[0]).slice(0, 2).join('')}</span><span><strong>{db.settings.profileName}</strong><small>{role}</small></span><ChevronDown size={15} aria-hidden="true" /></button>
+            <button className="profile-btn" aria-label="Open profile menu" aria-haspopup="dialog" onClick={() => setProfile(true)}><span className="avatar">{user.name.split(' ').map(n => n[0]).slice(0, 2).join('')}</span><span><strong>{user.name}</strong><small>{role}</small></span><ChevronDown size={15} aria-hidden="true" /></button>
           </div>
         </header>
+        {!connected && <div className="connection-warning" role="alert"><span>Connection interrupted. Reconnect before recording your next sale.</span><button className="btn small" onClick={() => void refresh().catch(e => toast(e.message, true))}>Reconnect</button></div>}
+        {workspace && !workspace.canWrite && <div className="connection-warning" role="status"><span>Your subscription needs attention. Existing records are available; new changes are paused.</span>{can(role, 'settings') && <NavLink to="/billing" className="btn small">Manage subscription</NavLink>}</div>}
         <main id="main" className="main-content" tabIndex={-1}>
           <Suspense fallback={<div className="route-loading" role="status" aria-label="Loading page"><div className="skeleton" /><div className="skeleton" /><span>Opening your workspace…</span></div>}><Outlet /></Suspense>
         </main>
-        <footer className="app-footer"><span>Smart Retail · Made for your everyday business</span><span>Local demo <span className="saved-dot" /> Demo data stored in this browser</span></footer>
+        <footer className="app-footer"><span>Smart Retail · Made for your everyday business</span><span><span className="saved-dot" /> {connected ? 'Connected to store server' : 'Connection interrupted'}</span></footer>
       </div>
-      {profile && <Dialog title="Your workspace" onClose={() => setProfile(false)}><div className="profile-summary"><span className="avatar">{db.settings.profileName.split(' ').map(n => n[0]).slice(0, 2).join('')}</span><div><strong>{db.settings.profileName}</strong><p>{db.settings.profileEmail}</p><Badge tone="blue">{role}</Badge></div></div><div className="profile-actions">{can(role, 'settings') && <button className="btn" onClick={() => { setProfile(false); navigate('/settings'); }}><Settings size={17} />Shop & profile settings<ArrowRight size={17} /></button>}<button className="btn" onClick={() => { setProfile(false); navigate('/staff'); }}><ShieldCheck size={17} />Staff & demo permissions<ArrowRight size={17} /></button></div></Dialog>}
+      {profile && <Dialog title="Your workspace" onClose={() => setProfile(false)}><div className="profile-summary"><span className="avatar">{user.name.split(' ').map(n => n[0]).slice(0, 2).join('')}</span><div><strong>{user.name}</strong><p>{user.email}</p><Badge tone="blue">{role}</Badge></div></div><div className="profile-actions">{can(role, 'settings') && <button className="btn" onClick={() => { setProfile(false); navigate('/settings'); }}><Settings size={17} />Shop & profile settings<ArrowRight size={17} /></button>}<button className="btn" onClick={() => { setProfile(false); navigate('/staff'); }}><ShieldCheck size={17} />Staff & permissions<ArrowRight size={17} /></button><button className="btn" onClick={() => { setProfile(false); setPassword(true); }}>Change password</button><button className="btn" onClick={() => void logout()}>Sign out</button></div></Dialog>}
+      {password && <ChangePassword onClose={() => setPassword(false)} />}
       {notifications && <Dialog title="Stock alerts" onClose={() => setNotifications(false)}><p className="muted">{low.length} variants need your attention.</p><div className="alert-list">{low.slice(0, 8).map(p => <button key={p.id} onClick={() => { setNotifications(false); navigate(`/inventory?search=${p.sku}`); }}><ProductThumb product={p} /><span><strong>{p.name}</strong><small>{p.size} · {p.colour}</small></span><Badge tone={p.quantity ? 'amber' : 'red'}>{p.quantity} left</Badge></button>)}</div>{!low.length && <Empty title="Stock looks healthy" description="All products are above their minimum levels." />}<button className="btn full" onClick={() => { setNotifications(false); navigate('/inventory?stock=Low+stock'); }}>View inventory</button></Dialog>}
-      {guide && <Dialog title="A day in your store" onClose={() => setGuide(false)}><p className="muted">Follow the journey from your first bill to your business report. Everything here uses fictional demo data.</p><ol className="tour-steps">{tour.map(([title, path, description]) => <li key={path}><button onClick={() => { setGuide(false); navigate(path); }}><strong>{title}</strong><span>{description}</span><ArrowUpRight size={17} aria-hidden="true" /></button></li>)}</ol></Dialog>}
+      {guide && <Dialog title="A day in your store" onClose={() => setGuide(false)}><p className="muted">Follow the journey from your first bill to your business report. Changes are saved to the shared store database.</p><ol className="tour-steps">{tour.map(([title, path, description]) => <li key={path}><button onClick={() => { setGuide(false); navigate(path); }}><strong>{title}</strong><span>{description}</span><ArrowUpRight size={17} aria-hidden="true" /></button></li>)}</ol></Dialog>}
     </>
   );
 }

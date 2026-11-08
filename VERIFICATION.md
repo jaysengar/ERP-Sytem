@@ -1,5 +1,51 @@
 # Verification record
 
+## Supabase PostgreSQL preparation — 8 November 2026
+
+- Production build and TypeScript: **passed**.
+- `npm.cmd test`: **48 passing tests** — 21 backend/payment/import tests, 18 domain tests, 4 startup tests and 5 storage/adapter tests.
+- `npm.cmd run test:e2e` with installed Chrome: **19 passed**, 42.7 seconds. The isolated SQLite test backend stopped afterward. No extra development server was left running.
+- Existing signup/authentication, tenant isolation, retail transactions, payment/refund behavior and browser routes pass after converting the database boundary to asynchronous transactions.
+- Storage tests cover TLS verification, rejection of transaction poolers, scoped SQL conflict targets, hidden uncommitted SQLite writes, rollback, PostgreSQL role/workspace configuration, and committing refund state before provider calls. PostgreSQL driver responses are simulated in these tests.
+- The local import preview read **3 workspaces and 2,225 business records** without connecting to a cloud database. A separate fixture test checks record/refund preservation and rejection of a nonempty import target. No existing records were imported or modified.
+- `npm.cmd run test:postgres`: **1 skipped**, because `TEST_DATABASE_URL` and the optional driver were unavailable. The test is prepared for real migrations, RLS, two backend instances, stock races and refund locks against a separate test database.
+- **Not executed:** hosted PostgreSQL connection/schema migration/RLS enforcement, actual PostgreSQL import, backup configuration or Supabase deployment. Package installation and `npm audit` requests were blocked by network access (`EACCES`); the optional `pg` driver remains to be installed.
+- JavaScript syntax checks and `git diff --check`: passed. No secrets were printed or added to frontend configuration.
+- Configuration and remaining provider checks: [server/SUPABASE.md](server/SUPABASE.md).
+
+## Upfront payment and seven-day refunds — 8 November 2026
+
+- Production build and TypeScript: **passed**.
+- Final `npm.cmd test`: **41 passing tests** — 20 backend/payment tests, 18 domain tests and 3 startup tests.
+- Full browser suite during this change: **19 passing tests** in installed Chrome. After the final refund retry and resubscription refinements, reran the four tests in `saas.spec.ts`: **4 passed**, including the extended refund → resubscribe → cancel-renewal flow.
+- New payment coverage: immediate subscription creation without a future start date, no editing before capture, verified first invoice/payment binding, a fixed seven-day deadline, full early refunds, late cancellation without refunds, and legacy trial preservation.
+- Refund recovery coverage: concurrent requests, restart persistence, timely cancellation across an outage, a payment arriving after cancellation, partial refunds, pending amounts reserved by the provider, explicit failed-attempt retries, lost responses, older failed attempts not authorizing a duplicate newer attempt, cross-workspace isolation, and signed refund webhooks.
+- Browser coverage includes signup consent and simulated hosted payment, paid access, cancellation confirmation, refund reference after reload, resubscription without another guarantee, and cancellation of its future renewal. The gateway and webhook signatures are simulated locally; tests never load private `.env` credentials or call real Razorpay.
+- Reviewed signup and Billing at desktop and 375px phone width, plus the mobile refund state. Screenshots in `artifacts/backend/`: `registration-desktop.png`, `registration-mobile.png`, `billing-desktop.png`, `billing-mobile.png`, `refund-mobile.png`. Screenshot capture disables transitions to avoid recording the mobile drawer during a viewport resize. No horizontal document overflow in the tested mobile flows.
+- **Still requires a Razorpay test-account check:** hosted checkout/mandate behavior, actual invoice/payment response fields, refund processing and public HTTPS webhook delivery. No real money was charged or refunded. See `server/README.md` for setup and recovery.
+- The isolated browser test backend stopped after the run. No development server was left running; restart an existing dev session to load the new backend.
+
+## Startup port handling — 8 November 2026
+
+- Stopped the assistant-started development instance that occupied ports 3001 and 5173.
+- The dev launcher checks both ports before spawning either server. The backend also handles a bind failure without an unhandled error, covering direct startup and port races.
+- `npm test`: **28 passing tests**, including occupied backend/frontend ports and direct backend startup failure. Startup tests use temporary directories and do not load the user's `.env`.
+- Smoke check: both health endpoints returned HTTP 200 after launch; a duplicate `npm run dev` exited with a readable message. Stopping the owned backend child also stopped its sibling frontend. Both development ports were released after verification.
+
+## Backend and SaaS — 8 November 2026
+
+- Production build and TypeScript: **passed**.
+- `npm test`: **25 passing tests** (18 existing domain tests and 7 API/SaaS tests). The three old browser-storage adapter tests were replaced by real persistence, transaction and retry coverage.
+- `npm run test:e2e`, installed Chrome: **18 passing tests**, 38.8 seconds, against a separate temporary SQLite backend at port 5191. The test runner starts and stops its own server; no user database or real Razorpay account is used.
+- API coverage: separate-workspace isolation, cross-tenant cookie rejection, restart persistence, hashed-password login, CSRF/origin checks, role redaction, password/session revocation, stock races, idempotency, rollback, purchase receiving, settings, expenses, SQL pagination, trial expiry, price validation, webhook signatures and event deduplication.
+- Browser coverage: registration, sign-out/sign-in, Billing, responsive forms, all previous retail workflows, retry after a checkout response is lost, and preventing another tab's workspace preference from redirecting requests.
+- Visually reviewed registration and Billing at desktop and 375px phone width. Fixed the signup form's mobile footer and checkbox alignment. Existing catalogue/checkout checks include 320px width and landscape with touch emulation.
+- Screenshots: `artifacts/backend/registration-desktop.png`, `registration-mobile.png`, `billing-desktop.png`, `billing-mobile.png`.
+- **Not verified:** real Razorpay checkout, mandate authorization and webhook delivery. Tests use simulated provider responses; external network access was blocked. Test credentials and a public HTTPS webhook host are still required.
+- **Hosting boundary:** one Node process with persistent SQLite storage. No live deployment, email verification/recovery service, production backup automation or large-history scaling validation was performed. See `server/README.md`.
+
+## Earlier frontend verification
+
 Date: 7 November 2026. Impeccable refinement followed by a UI/UX Pro Max refinement of the existing single-store frontend demo.
 
 ## Results
@@ -44,7 +90,7 @@ $env:PLAYWRIGHT_CHANNEL = 'chrome'
 npm run test:e2e
 ```
 
-The browser suite normally starts or reuses the development server on port 5173. To test a production build, run `npm run preview -- --port 5180 --strictPort` in another terminal, then set `$env:RETAIL_PREVIEW_URL = 'http://127.0.0.1:5180'` before testing.
+The current `npm.cmd run test:e2e` builds the app and starts/stops its own temporary SQLite backend at port 5191. It does not reuse the user's development server. The inspection commands below belong to the historical frontend demo checks and are not the current authenticated SaaS test runner.
 
 ```powershell
 node scripts/inspect-ui.mjs artifacts/ui-pro-max
@@ -55,4 +101,4 @@ The inspection scripts use installed Chrome and respect `RETAIL_PREVIEW_URL`. Br
 
 ## Scope of verification
 
-Tablet and phone layouts were tested through desktop Chrome viewport emulation, not physical devices. Other browser engines, screen readers and a physical printer have not been exercised. The application remains a local demo; these results do not establish readiness for live retail operations.
+Tablet and phone layouts were tested through desktop Chrome viewport emulation, not physical devices. Other browser engines, screen readers and a physical printer have not been exercised. The earlier frontend results describe the original local demo; the current backend and payment checks above do not establish readiness for live commercial operation without the remaining provider and hosting verification.

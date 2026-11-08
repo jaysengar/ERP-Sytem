@@ -2,7 +2,7 @@ import type { CheckoutInput, Database, Expense, Permission, Product, ProductQuer
 import { can, categories } from './types';
 import { dateKey, round, sum, uid } from './format';
 
-export function requirePermission(role: Role, action: Permission) { if (!can(role, action)) throw new Error('Your demo role does not have permission for this action.'); }
+export function requirePermission(role: Role, action: Permission) { if (!can(role, action)) throw new Error('Your role does not have permission for this action.'); }
 function amount(n: number, label: string, positive = false) { if (!Number.isFinite(n) || n < (positive ? 0.01 : 0) || n > 1e9) throw new Error(`${label} must be ${positive ? 'greater than zero' : 'zero or more'} and below ₹100 crore.`); if (Math.abs(n * 100 - Math.round(n * 100)) > 0.00001) throw new Error(`${label} can have at most two decimal places.`); }
 function quantity(n: number, label = 'Quantity', zero = false) { if (!Number.isSafeInteger(n) || n < (zero ? 0 : 1) || n > 1e6) throw new Error(`${label} must be a whole number ${zero ? 'from 0' : 'from 1'} to 10,00,000.`); }
 function required(value: string, label: string) { if (!value.trim()) throw new Error(`${label} is required.`); }

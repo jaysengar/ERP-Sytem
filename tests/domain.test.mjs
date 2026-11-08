@@ -5,12 +5,8 @@ import { adjustStock, calculateBill, checkout, createPurchase, queryProducts, re
 import { productSales, salesInRange } from '../src/domain/analytics.ts';
 import { parseProductCsv } from '../src/domain/csv.ts';
 import { dateKey, sum } from '../src/domain/format.ts';
-import { repository, STORAGE_KEY } from '../src/data/repository.ts';
 
 const owner = 'Owner / Admin';
-// Exercise the adapter's in-process serialization independently of Node's
-// experimental LockManager. Cross-tab browser locks are a separate browser concern.
-Object.defineProperty(navigator, 'locks', { configurable: true, value: undefined });
 const fresh = () => seedDatabase(new Date('2026-11-07T10:30:00+05:30'));
 const input = (db, overrides = {}) => ({ lines: [{ productId: db.products[1].id, quantity: 3 }], discount: 0, customerName: 'Test Customer', mobile: '9876543210', paymentMethod: 'UPI', ...overrides });
 const transaction = (db, operation) => { const draft = structuredClone(db); const result = operation(draft); Object.assign(db, draft); return result; };
@@ -76,27 +72,4 @@ test('CSV supports quoted commas and rejects malformed or empty files', () => {
 test('financial amounts reject fractional paise and dates reject impossible calendar values', () => {
   const db = fresh(); assert.throws(() => checkout(db, owner, input(db, { discount: 1.001 })), /two decimal/);
   assert.throws(() => saveExpense(db, owner, { id: 'invalid', category: 'Other', description: 'Invalid date', amount: 10, date: '2026-02-31' }), /valid date/);
-});
-
-test('repository serializes concurrent writes and persists successful transactions', async () => {
-  const memory = new Map();
-  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: key => memory.get(key) ?? null, setItem: (key, value) => memory.set(key, value) } });
-  const db = await repository.load(); const before = db.products[1].quantity;
-  await Promise.all([repository.transaction(d => adjustStock(d, owner, 'p-2', 1, 'First count')), repository.transaction(d => adjustStock(d, owner, 'p-2', 2, 'Second count'))]);
-  const saved = await repository.load(); assert.equal(saved.products[1].quantity, before + 3); assert.equal(saved.revision, 2); assert.equal(JSON.parse(memory.get(STORAGE_KEY)).movements.length, 2);
-});
-
-test('repository does not commit failed operations or overwrite unreadable saved data', async () => {
-  let saved = JSON.stringify(fresh());
-  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: () => saved, setItem: (_key, value) => { saved = value; } } });
-  const before = saved; await assert.rejects(repository.transaction(d => { d.products[1].quantity = 99; throw new Error('Rejected'); }), /Rejected/); assert.equal(saved, before);
-  saved = '{broken'; await assert.rejects(repository.load(), /not been overwritten/); assert.equal(saved, '{broken');
-});
-
-test('storage quota failures report an error without persisting stock changes', async () => {
-  const saved = JSON.stringify(fresh());
-  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: () => saved, setItem: () => { throw new Error('QuotaExceededError'); } } });
-  await assert.rejects(repository.transaction(d => adjustStock(d, owner, 'p-2', 5, 'Count')), /could not save/);
-  assert.equal((await repository.load()).products[1].quantity, fresh().products[1].quantity);
-  delete globalThis.localStorage;
 });

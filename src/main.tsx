@@ -18,7 +18,8 @@ const Expenses = lazy(() => import('./pages/Expenses'));
 const Reports = lazy(() => import('./pages/Reports'));
 const Staff = lazy(() => import('./pages/Staff'));
 const Settings = lazy(() => import('./pages/Settings'));
-function Access({ action, children }: { action: Permission; children: ReactNode }) { const { role } = useStore(); return can(role, action) ? children : <><h1>Owner access required</h1><Empty title="This page is restricted for your demo role" description={`You are viewing the store as ${role}. Change your preview role on the Staff & access page.`} action={<Link className="btn primary" to="/staff">View demo roles</Link>} /></>; }
+const Billing = lazy(() => import('./pages/Billing'));
+function Access({ action, children }: { action: Permission; children: ReactNode }) { const { role } = useStore(); return can(role, action) ? children : <><h1>Owner access required</h1><Empty title="This page is restricted for your account" description={`You are signed in as ${role}. Ask your store owner if you need different access.`} action={<Link className="btn primary" to="/staff">View your access</Link>} /></>; }
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
@@ -37,6 +38,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="reports" element={<Access action="reports"><Reports /></Access>} />
               <Route path="staff" element={<Staff />} />
               <Route path="settings" element={<Access action="settings"><Settings /></Access>} />
+              <Route path="billing" element={<Access action="settings"><Billing /></Access>} />
               <Route path="*" element={<Empty title="Page not found" description="Return to your store dashboard to continue." action={<Link to="/" className="btn primary">Open dashboard</Link>} />} />
             </Route>
           </Routes>
